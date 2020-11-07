@@ -1,6 +1,6 @@
 # **Blender - Discord Rich Presence (Add-on)**
 
-<!-- ![Rich Presence Preview](Asset/Image/Preview.png) -->
+![Preview](../Asset/Image/Preview.png)
 
 ## **Documentation**
 

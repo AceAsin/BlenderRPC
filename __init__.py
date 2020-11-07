@@ -27,7 +27,7 @@ Blender = 'blender'
 Badge = 'badge'
 Invite = 'discord.gg/U8vHS7y'
 Time = None
-isRendering = False
+Render = False
 Frame = 0
 Field = None
 Preview = {}
@@ -258,17 +258,17 @@ def writePidHandler(*args):
 
 @persistent
 def startRenderJobHandler(*args):
-  global isRendering
+  global Render
   global Time
-  isRendering = True
+  Render = True
   Time = time.time()
 
 @persistent
 def endRenderJobHandler(*args):
-  global isRendering
+  global Render
   global Frame
   global Time
-  isRendering = False
+  Render = False
   Frame = 0
   Time = time.time()
 
@@ -301,7 +301,7 @@ def updatePresence():
   Version = str(getVersion()[1])
 
   # Details
-  if (Prefs.DetailsToggle and not isRendering or Prefs.DetailsToggle and not Prefs.RenderedDetails and isRendering):
+  if (Prefs.DetailsToggle and not Render or Prefs.DetailsToggle and not Prefs.RenderedDetails and Render):
     if (Prefs.CustomDetails == ''):
       Details = f'Project: {getProject()}' or 'Project: Untitled'
     else:
@@ -319,12 +319,12 @@ def updatePresence():
       #     Layer = Layer.replace(i, getCount(i) + '\u200B')
 
       Details = Layer + '\u200B'
-  elif (Prefs.DetailsToggle and isRendering):
+  elif (Prefs.DetailsToggle and Render):
     Details = f'Engine: {getRenderEngine()}'
   else: Details = None
 
   # State
-  if (Prefs.StateToggle and not isRendering or Prefs.StateToggle and not Prefs.RenderedState and isRendering):
+  if (Prefs.StateToggle and not Render or Prefs.StateToggle and not Prefs.RenderedState and Render):
     if (Prefs.CustomState == ''):
       if (Prefs.StateToolbar == 'PRESET'):
         if Prefs.StatePreset == 'NONE': State = f'State: {None}'
@@ -359,7 +359,7 @@ def updatePresence():
       #     Layer = Layer.replace(i, getCount(i) + '\u200B')
 
       State = Layer + '\u200B'
-  elif (Prefs.StateToggle and isRendering):
+  elif (Prefs.StateToggle and Render):
     Range = getFrameRange()
 
     if (Frame > 0):
@@ -369,9 +369,9 @@ def updatePresence():
   else: State = None
 
   # Timestamp
-  if (Prefs.ElapsedTime and not isRendering or Prefs.ElapsedTime and not Prefs.RenderedTime and isRendering):
+  if (Prefs.ElapsedTime and not Render or Prefs.ElapsedTime and not Prefs.RenderedTime and Render):
     Timestamp = Duration
-  elif (Prefs.ElapsedTime and isRendering):
+  elif (Prefs.ElapsedTime and Render):
     Timestamp = Time
   else:
     Timestamp = None
@@ -513,7 +513,6 @@ def getProps():
   Description = ['Show', 'on state']
 
   Count = [
-    # ('NONE', 'None', 'Clear state.'),
     ('{Actions}', 'Actions', f'{Description[0]} action count {Description[1]}'),
     ('{Armatures}', 'Armatures', f'{Description[0]} armature count {Description[1]}'),
     ('{Brushes}', 'Brushes', f'{Description[0]} brush count {Description[1]}'),
@@ -572,13 +571,11 @@ def getProps():
     return sorted(Count + Extra[0] + Extra[1])
 
 def getRenderEngine():
-  """Selected render engine"""
   internalName = bpy.context.engine
   internalNameStripped = internalName.replace('BLENDER_', '').replace('_', ' ')
   return internalNameStripped.title()
 
 def getFrameRange():
-  """Current frame and total remaining frames"""
   start = bpy.context.scene.frame_start
   end = bpy.context.scene.frame_end
   cursor = bpy.context.scene.frame_current

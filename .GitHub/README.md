@@ -1,4 +1,4 @@
-# **Blender - Discord Rich Presence (Add-on)**
+# **Blender - Discord Rich Presence (Add-On)**
 
 ![Preview](../Asset/Image/Preview.png)
 

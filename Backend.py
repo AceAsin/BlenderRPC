@@ -1712,4 +1712,4 @@ class GitlabEngine(object):
 # should be what's imported to other files
 # -----------------------------------------------------------------------------
 
-Updater = Singleton_updater()
+updater = Singleton_updater()

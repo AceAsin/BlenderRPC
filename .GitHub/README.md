@@ -2,35 +2,58 @@
 
 ![Preview](../Asset/Image/Preview.png)
 
+## **Library**
+
+[![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=python&logoColor=FFFFFF&label=Module&color=FFFFFF)](https://github.com/qwertyquerty/pypresence)
+
 ## **Documentation**
 
 * **Support**
   * Developer: [Ace Asin](https://discord.com/users/373656777671311360)
   * Server: [Ace Asin](https://discord.gg/U8vHS7y)
-* **Required Blender Version**
+
+* **Blender**
   * 2.80+
-* **Image & Text**
-  * Large - Display the current Blender build and version, when hovering over the large image.
-  * Small -  Display the support Discord server invite, when hovering over the small image.
-* **Toogle**
-  * Elapsed Details - Boolean option for details
-  * Elapsed State - Boolean option for state.
-  * Elapsed Time - Boolean option for duration.
-  * Rendered Details - Boolean option for details.
-  * Rendered State - Boolean option for state.
-  * Rendered Time - Boolean option for duration.
+
+* **Toggle**
+  * Elapsed: Details - Toggle option for details.
+  * Elapsed: State - Toggle option for state.
+  * Elapsed: Time - Toggle option for duration.
+  * Rendered: Details - Toggle option for details.
+  * Rendered: State - Toggle option for state.
+  * Rendered: Time - Toggle option for duration.
+  <!-- * Button: 1 - Toggle option for the first button. -->
+  <!-- * Button: 2 - Toggle option for the second button. -->
+
 * **Custom**
-  * Details - Set a custom string with optional variables.
-  * State - Set a custom string with optional variables.
+  * Custom: Details - Custom details with optional variables.
+  * Custom: State - Custom state with optional variables.
+  * Custom: Large - Custom large image hover text with optional variables.
+  * Custom: Small - Custom small image hover text with optional variables.
+  <!-- * Custom: Button 1 - Custom button label and url. -->
+  <!-- * Custom: Button 2 - Custom button label and url. -->
+
 * **Option**
 
   <details>
 
   <summary>Variable</summary>
 
-  * `{Object}` - It will display the active object name.
-  * `{Mode}` - It will display the active object mode.
-  * `{Type}` - It will thesplay the active object type.
+  * `{Discord}` - Display the discord server invite.
+
+  ---
+  * `{Project}` - Display the project name.
+
+  ---
+
+  * `{Build}` - Display the current build.
+  * `{Version}` - Display the current version.
+
+  ---
+
+  * `{Object}` - Display the active object name.
+  * `{Mode}` - Display the active object mode.
+  * `{Type}` - Display the active object type.
 
   ---
 

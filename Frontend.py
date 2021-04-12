@@ -30,7 +30,7 @@ from bpy.app.handlers import persistent
 # updater import, import safely
 # Prevents popups for users with invalid python installs e.g. missing libraries
 try:
-	from .Backend import Updater as updater
+	from .Backend import updater
 except Exception as e:
 	print('ERROR INITIALIZING UPDATER')
 	print(str(e))

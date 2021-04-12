@@ -1,5 +1,5 @@
 bl_info = {
-  'name': 'Blender Rich Presence',
+  'name': 'Blender - Discord Rich Presence',
   'description': 'Discord Rich Presence support for Blender',
   'author': 'Ace Asin',
   'version': (1, 0, 0),
@@ -12,17 +12,18 @@ bl_info = {
 }
 
 import time, os, sys, pathlib
-from .pypresence import pypresence as rpc
+from .pypresence import pypresence as RPC
 
 import bpy
 import bpy.utils.previews
 import webbrowser
 
 from bpy.app.handlers import persistent
-from . import Frontend as updater
-from .Backend import Updater
 
-Presence = rpc.Presence('566658117212045325')
+from . import Frontend
+from . import Backend
+
+Presence = RPC.Presence('566658117212045325')
 Blender = 'blender'
 Badge = 'badge'
 Invite = 'discord.gg/U8vHS7y'
@@ -34,6 +35,7 @@ Preview = {}
 Collection = None
 Duration = time.time()
 Path = os.path.join(os.path.dirname(os.path.normpath(bpy.app.tempdir)), 'BlendRpcPid')
+Button = [{ 'label': 'Website', 'url': 'https://aceasin.com' }, { 'label': 'Discord', 'url': 'https://discord.gg/U8vHS7y' }]
 
 class Discord(bpy.types.Operator):
   bl_idname = 'aceasin.discord'
@@ -184,12 +186,12 @@ def register():
   bpy.app.handlers.render_post.append(postRenderHandler)
   # Operator
   for cls in classes:
-    updater.make_annotations(cls)
+    Frontend.make_annotations(cls)
     bpy.utils.register_class(cls)
   bpy.utils.register_class(Menu)
   bpy.utils.register_class(SubMenu)
   # Updater
-  updater.register(bl_info)
+  Frontend.register(bl_info)
   # Icon
   Collection = bpy.utils.previews.new()
   Root = os.path.dirname(__file__)
@@ -220,7 +222,7 @@ def unregister():
   bpy.utils.unregister_class(Menu)
   bpy.utils.unregister_class(SubMenu)
   # Updater
-  updater.unregister()
+  Frontend.unregister()
   # Icon
   print('UNLOADING ICONS!')
   for Collection in Preview.values(): bpy.utils.previews.remove(Collection)
@@ -297,28 +299,12 @@ def updatePresence():
   Counter = ['{Actions}', '{Armatures}', '{Brushes}', '{Cache Files}', '{Cameras}', '{Collections}', '{Curves}', '{Fonts}', '{Grease Pencils}', '{Images}', '{Lattices}', '{Libraries}', '{Lightprobes}', '{Lights}', '{Linestyles}', '{Masks}', '{Materials}', '{Meshes}', '{Metaballs}', '{Movieclips}', '{Node Groups}', '{Objects}', '{Paint Curves}', '{Palettes}', '{Particles}', '{Scenes}', '{Screens}', '{Shape Keys}', '{Sounds}', '{Speakers}', '{Texts}', '{Textures}', '{Window Managers}', '{Workspaces}', '{Worlds}']
   Extra = [['{Volumes}'], ['{Hairs}', '{Pointclouds}', '{Simulations}']]
 
-  # Version
-  Version = str(getVersion()[1])
-
   # Details
   if (Prefs.DetailsToggle and not Render or Prefs.DetailsToggle and not Prefs.RenderedDetails and Render):
     if (Prefs.CustomDetails == ''):
       Details = f'Project: {getProject()}' or 'Project: Untitled'
     else:
-      Layer = Prefs.CustomDetails
-
-      if ('{Object}' in Prefs.CustomDetails): Layer = Layer.replace('{Object}', getObject() + '\u200B')
-      if ('{Mode}' in Prefs.CustomDetails): Layer = Layer.replace('{Mode}', getMode() + '\u200B')
-      if ('{Type}' in Prefs.CustomDetails): Layer = Layer.replace('{Type}', getType() + '\u200B')
-      for i in Counter:
-        if i in Prefs.CustomDetails: Layer = Layer.replace(i, getCount(i) + '\u200B')
-      for i in Extra[0]:
-        if (i in Prefs.CustomDetails and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a'): Layer = Layer.replace(i, getCount(i) + '\u200B')
-      # for i in Extra[1]:
-      #   if (i in Prefs.CustomState and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a' or Version != '83'):
-      #     Layer = Layer.replace(i, getCount(i) + '\u200B')
-
-      Details = Layer + '\u200B'
+      Details = getCustom(Prefs.CustomDetails, Counter, Extra)
   elif (Prefs.DetailsToggle and Render):
     Details = f'Engine: {getRenderEngine()}'
   else: Details = None
@@ -343,22 +329,7 @@ def updatePresence():
         #   if (i == Prefs.StateCounter):
         #     State = f'{i}: {getCount(i)}'.replace('{', '').replace('}', '')
     else:
-      Layer = Prefs.CustomState
-
-      if ('{Object}' in Prefs.CustomState): Layer = Layer.replace('{Object}', getObject() + '\u200B')
-      if ('{Mode}' in Prefs.CustomState): Layer = Layer.replace('{Mode}', getMode() + '\u200B')
-      if ('{Type}' in Prefs.CustomState): Layer = Layer.replace('{Type}', getType() + '\u200B')
-      for i in Counter:
-        if i in Prefs.CustomState:
-          Layer = Layer.replace(i, getCount(i) + '\u200B')
-      for i in Extra[0]:
-        if (i in Prefs.CustomState and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a'):
-          Layer = Layer.replace(i, getCount(i) + '\u200B')
-      # for i in Extra[1]:
-      #   if (i in Prefs.CustomState and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a' or Version != '83'):
-      #     Layer = Layer.replace(i, getCount(i) + '\u200B')
-
-      State = Layer + '\u200B'
+      State = getCustom(Prefs.CustomState, Counter, Extra)
   elif (Prefs.StateToggle and Render):
     Range = getFrameRange()
 
@@ -368,6 +339,18 @@ def updatePresence():
       State = f'Image: Render Frame 1 / 1'
   else: State = None
 
+  # Large
+  if (Prefs.CustomLarge == ''):
+    Large = f'{getBuild()} {getVersion()}'
+  else:
+    Large = getCustom(Prefs.CustomLarge, Counter, Extra)
+
+  # Small
+  if (Prefs.CustomSmall == ''):
+    Small = 'Blender'
+  else:
+    Small = getCustom(Prefs.CustomSmall, Counter, Extra)
+
   # Timestamp
   if (Prefs.ElapsedTime and not Render or Prefs.ElapsedTime and not Prefs.RenderedTime and Render):
     Timestamp = Duration
@@ -376,19 +359,47 @@ def updatePresence():
   else:
     Timestamp = None
 
-  # Version
-  Version = f'{getBuild()} {getVersion()[0]}.{getVersion()[1]}.{getVersion()[2]}'
-
   Presence.update(
     pid=os.getpid(),
     start=Timestamp,
     details=Details,
     state=State,
     large_image=Blender,
-    large_text=Version,
+    large_text=Large,
     small_image=Badge,
-    small_text=Invite
+    small_text=Small,
+    buttons=Button
   )
+
+def getCustom(Custom, Counter, Extra):
+  Version = str(bpy.app.version[1])
+
+  Layer = Custom
+
+  if ('{Discord}' in Custom): Layer = Layer.replace('{Discord}', Invite + '\u200B')
+
+  if ('{Project}' in Custom): Layer = Layer.replace('{Project}', getProject() + '\u200B')
+
+  if ('{Build}' in Custom): Layer = Layer.replace('{Build}', getBuild() + '\u200B')
+  if ('{Version}' in Custom): Layer = Layer.replace('{Version}', getVersion() + '\u200B')
+
+  if ('{Object}' in Custom): Layer = Layer.replace('{Object}', getObject() + '\u200B')
+  if ('{Mode}' in Custom): Layer = Layer.replace('{Mode}', getMode() + '\u200B')
+  if ('{Type}' in Custom): Layer = Layer.replace('{Type}', getType() + '\u200B')
+
+  for i in Counter:
+    if i in Custom:
+      Layer = Layer.replace(i, getCount(i) + '\u200B')
+
+  for i in Extra[0]:
+    if (i in Custom and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a'):
+      Layer = Layer.replace(i, getCount(i) + '\u200B')
+
+  # for i in Extra[1]:
+  #   if (i in Prefs.CustomState and Version != '80' or Version != '81' or Version != '81a' or Version != '82' or Version != '82a' or Version != '83'):
+  #     Layer = Layer.replace(i, getCount(i) + '\u200B')
+
+  return Layer + '\u200B'
 
 def getProject():
   try:
@@ -498,7 +509,7 @@ def getBuild():
   return Build
 
 def getVersion():
-  Version = bpy.app.version
+  Version = bpy.app.version_string
   return Version
 
 def getPreset():
@@ -561,11 +572,11 @@ def getProps():
     ]
   ]
 
-  Version = getVersion()[1]
+  Version = str(bpy.app.version[1])
 
-  if (str(Version) == '80' or str(Version) == '81' or str(Version) == '81a' or str(Version) == '82' or str(Version) == '82a'):
+  if (Version == '80' or Version == '81' or Version == '81a' or Version == '82' or Version == '82a'):
     return Count
-  elif (str(Version) == '83'):
+  elif (Version == '83'):
     return sorted(Count + Extra[0])
   else:
     return sorted(Count + Extra[0] + Extra[1])
@@ -585,12 +596,13 @@ def updateCustom(self, context):
   updatePresence()
 
 def TargetVersion(self, context):
-	if Updater.invalidupdater == True:
+
+	if Backend.updater.invalidupdater == True:
 		ret = []
 
 	ret = []
 	i=0
-	for tag in Updater.tags:
+	for tag in Backend.updater.tags:
 		ret.append( (tag,tag,'Select to install '+tag) )
 		i+=1
 	return ret
@@ -646,14 +658,28 @@ class RpcPreferences(bpy.types.AddonPreferences):
 
   CustomDetails: bpy.props.StringProperty(
     name = 'Custom Details',
-    description = 'Set custom details for Discord Rich Presence',
+    description = 'Custom details with optional variables',
     default = '',
     update = updateCustom
   )
 
   CustomState: bpy.props.StringProperty(
     name = 'Custom State',
-    description = 'Set custom state for Discord Rich Presence',
+    description = 'Custom state with optional variables',
+    default = '',
+    update = updateCustom
+  )
+
+  CustomLarge: bpy.props.StringProperty(
+    name = 'Large Text',
+    description = 'Custom large image hover text with optional variables',
+    default = '',
+    update = updateCustom
+  )
+
+  CustomSmall: bpy.props.StringProperty(
+    name = 'Small Text',
+    description = 'Custom small image hover text with optional variables',
     default = '',
     update = updateCustom
   )
@@ -671,7 +697,7 @@ class RpcPreferences(bpy.types.AddonPreferences):
   def draw(self, context):
     layout = self.layout
 
-    updater.update_settings_ui(self, context) # FILE_FOLDER
+    Frontend.update_settings_ui(self, context) # FILE_FOLDER
 
     #########
     # START #
@@ -750,7 +776,7 @@ class RpcPreferences(bpy.types.AddonPreferences):
 
     row = layout.row(align=True)
     col1 = row.column(align=True)
-    col1.label(text='Custom:')
+    col1.label(text='String:')
     col2 = row.column(align=True)
     col2.alignment = 'RIGHT'
     col2.label(icon='OPTIONS')
@@ -760,10 +786,16 @@ class RpcPreferences(bpy.types.AddonPreferences):
     row.prop(self, 'CustomDetails', text = '')
 
     row = layout.row(align = True)
-    col1 = row.column()
-    col1 = row.label(text = 'Custom: State')
-    col2 = row.column()
-    col2.prop(self, 'CustomState', text = '') # RESTRICT_VIEW_ON / RESTRICT_VIEW_OFF / TRACKER / PINNED / OPTIONS
+    row.label(text = 'Custom: State')
+    row.prop(self, 'CustomState', text = '') # RESTRICT_VIEW_ON / RESTRICT_VIEW_OFF / TRACKER / PINNED / OPTIONS
+
+    row = layout.row(align = True)
+    row.label(text = 'Custom: Large')
+    row.prop(self, 'CustomLarge', text = '')
+
+    row = layout.row(align = True)
+    row.label(text = 'Custom: Small')
+    row.prop(self, 'CustomSmall', text = '')
 
     #######
     # END #

@@ -2,15 +2,15 @@
 
 ![Preview](../Asset/Image/Preview.png)
 
+## **Support**
+
+[![Discord](https://img.shields.io/discord/492294696912158720?color=FFFFFF&logoColor=FFFFFF&label=%CE%9BCE%20%CE%9BSIN%E2%84%A2&logo=Discord&style=for-the-badge)](https://discord.gg/U8vHS7y)
+
 ## **Library**
 
-[![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=python&logoColor=FFFFFF&label=Module&color=FFFFFF)](https://github.com/qwertyquerty/pypresence)
+[![PYPresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=python&logoColor=FFFFFF&label=Module&color=FFFFFF)](https://github.com/qwertyquerty/pypresence)
 
 ## **Documentation**
-
-* **Support**
-  * Developer: [Ace Asin](https://discord.com/users/373656777671311360)
-  * Server: [Ace Asin](https://discord.gg/U8vHS7y)
 
 * **Blender**
   * 2.80+
